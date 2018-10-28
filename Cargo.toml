@@ -1,0 +1,11 @@
+[package]
+name = "gas_rust_cursive_1"
+version = "0.1.0"
+authors = ["raizul8 <bogarazvan2@gmail.com>"]
+
+[dependencies]
+cursive = "0.9.2"
+chrono = "0.4.6"
+serde = "1.0.80"
+serde_json = "1.0.32"
+serde_derive = "1.0.80"
