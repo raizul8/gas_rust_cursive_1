@@ -8,6 +8,7 @@ use chrono::prelude::*;
 
 use std::error::Error;
 
+use std::fs;
 use std::fs::File;
 use std::io::Read;
 
@@ -25,15 +26,35 @@ use gas_libs::static_variables_form::static_variables_form as STATIC;
 
 fn validate_form_on_submit(s: &mut Cursive) {
     match validate_form(s) {
-        Ok(_) => s.add_layer(Dialog::info("Form validated and saved on disk.")),
+        Ok(gas_input) => {
+            let msg = format!(
+                "Form validated and saved on disk. \n{}",
+                gas_input.to_string()
+            );
+            s.add_layer(Dialog::info(msg));
+        }
         Err(err) => s.add_layer(Dialog::info(err)),
     }
 }
 
-pub fn validate_form(s: &mut Cursive) -> Result<(), String> {
+fn delete_last_entry() {
+    let mut gas_entries = get_gas_entries(STATIC::GAS_DATA_JSON_FILE);
+    gas_entries.pop();
+
+    let gas_entries_json = serde_json::to_string_pretty(&gas_entries).unwrap();
+
+    fs::write(STATIC::GAS_DATA_JSON_FILE, &gas_entries_json).expect(&format!(
+        "\n- File: {} \n- line: {} \n- err: {}\n",
+        file!(),
+        line!(),
+        "Could not write to file"
+    ));
+}
+
+pub fn validate_form(s: &mut Cursive) -> Result<GasEntry, String> {
     let mut gas_entries = get_gas_entries(STATIC::GAS_DATA_JSON_FILE);
     let len_gas_entries = gas_entries.len();
-    let last_gas: &mut GasEntry = &mut gas_entries[len_gas_entries - 1];
+    let last_gas: GasEntry = (gas_entries[len_gas_entries - 1]).clone();
     let last_date = DateTime::parse_from_rfc3339(&last_gas.date)
         .expect("Could not parse last date from gas_entries");
 
@@ -44,7 +65,7 @@ pub fn validate_form(s: &mut Cursive) -> Result<(), String> {
     }
 
     match validate_gas_input_on_submit(gas_input, last_gas.cMeters) {
-        Ok(_) => last_gas.cMeters = gas_input,
+        Ok(_) => {}
         Err(err) => return Err(err),
     }
 
@@ -55,7 +76,7 @@ pub fn validate_form(s: &mut Cursive) -> Result<(), String> {
     }
 
     match validate_date_on_form_submit(form_date, last_date) {
-        Ok(_) => last_gas.date = form_date.to_rfc3339_opts(chrono::SecondsFormat::Millis, true),
+        Ok(_) => {}
         Err(err) => return Err(err),
     }
 
@@ -66,12 +87,34 @@ pub fn validate_form(s: &mut Cursive) -> Result<(), String> {
     }
 
     match validate_cubic_meter_price_on_submit(c_price) {
-        Ok(_) => last_gas.cPrice = c_price,
+        Ok(_) => {}
         Err(err) => return Err(err),
     }
 
-    // s.add_layer(Dialog::info("Data validated and SAVED ON DISK."));
-    Ok(())
+    let consumed = gas_input - last_gas.cMeters;
+
+    let valid_form_gas_entry = GasEntry {
+        date: form_date.to_rfc3339_opts(SecondsFormat::Millis, true),
+        cMeters: gas_input,
+        consumed,
+        cPrice: c_price,
+        total: consumed as f64 * c_price,
+    };
+
+    let res_valid_form_gas_entry = valid_form_gas_entry.clone();
+
+    gas_entries.push(valid_form_gas_entry);
+
+    let gas_entries_json = serde_json::to_string_pretty(&gas_entries).unwrap();
+
+    fs::write(STATIC::GAS_DATA_JSON_FILE, &gas_entries_json).expect(&format!(
+        "\n- File: {} \n- line: {} \n- err: {}\n",
+        file!(),
+        line!(),
+        "Could not write to file"
+    ));
+
+    Ok(res_valid_form_gas_entry)
 }
 
 pub fn get_form_gas_input(s: &mut Cursive) -> Result<i32, String> {
@@ -127,7 +170,7 @@ pub fn get_form_date(s: &mut Cursive) -> Result<DateTime<chrono::FixedOffset>, S
 }
 
 fn validate_gas_input_on_submit(input_gas: i32, last_gas: i32) -> Result<(), String> {
-    if input_gas < last_gas {
+    if input_gas <= last_gas {
         return Err(format!(
             "Input {} must be greater than {}.",
             input_gas, last_gas
@@ -204,7 +247,7 @@ pub fn validate_date_on_form_submit(
     return Ok(());
 }
 
-pub fn start_gas_entry_logic(s: &mut Cursive) {
+pub fn populate_form_with_date_and_c_price(s: &mut Cursive) {
     let gas_entries = get_gas_entries(STATIC::GAS_DATA_JSON_FILE);
     let last_entry = &gas_entries[gas_entries.len() - 1];
 
@@ -220,6 +263,9 @@ pub fn start_gas_entry_logic(s: &mut Cursive) {
         view.set_content(last_entry.cPrice.to_string());
     });
 }
+
+// check functions are just checking for correct format ex: gas input date is an actual date,
+// gas input is a whole number.
 
 pub fn check_gas_field(s: &mut Cursive, _gas_amount: &str) {
     match get_form_gas_input(s) {
@@ -243,13 +289,29 @@ fn check_date_field(s: &mut Cursive, _date: &str) {
 }
 
 #[allow(non_snake_case)]
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct GasEntry {
     date: String,
     cMeters: i32,
     consumed: i32,
     cPrice: f64,
     total: f64,
+}
+
+impl ToString for GasEntry {
+    fn to_string(&self) -> String {
+        format!(
+            "
+GasEntry {{
+    cMeters: {} 
+    Date: {} 
+    consumed: {} 
+    cPrice: {} 
+    total: {}
+}}",
+            self.cMeters, self.date, self.consumed, self.cPrice, self.total
+        )
+    }
 }
 
 pub fn get_gas_entries(file: &str) -> Vec<GasEntry> {
@@ -316,6 +378,7 @@ pub fn gas_entry_dialog(siv: &mut Cursive) {
                         )
                 ),
         ).button("Validate & Insert", |s| validate_form_on_submit(s))
+        .button("Delete Last Entry", |_| delete_last_entry())
         .button("Quit", |s| s.quit())
         .h_align(HAlign::Center),
     );

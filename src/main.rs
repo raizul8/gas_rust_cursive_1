@@ -28,7 +28,7 @@ fn cursive_linear() {
     let mut siv = Cursive::default();
 
     fv::gas_entry_dialog(&mut siv);
-    fv::start_gas_entry_logic(&mut siv);
+    fv::populate_form_with_date_and_c_price(&mut siv);
 
     siv.run();
 }

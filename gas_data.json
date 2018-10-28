@@ -3,8 +3,8 @@
     "date": "2013-12-15T09:26:14.635Z",
     "cMeters": 22279,
     "consumed": 0,
-    "cPrice": 0,
-    "total": 0
+    "cPrice": 0.0,
+    "total": 0.0
   },
   {
     "date": "2014-01-15T11:27:19.876Z",
@@ -60,7 +60,7 @@
     "cMeters": 24255,
     "consumed": 86,
     "cPrice": 1.4,
-    "total": 120.39999999999999
+    "total": 120.4
   },
   {
     "date": "2014-09-16T09:58:15.962Z",
@@ -81,7 +81,7 @@
     "cMeters": 24753,
     "consumed": 305,
     "cPrice": 1.4,
-    "total": 427
+    "total": 427.0
   },
   {
     "date": "2014-12-15T09:08:13.901Z",
@@ -207,7 +207,7 @@
     "cMeters": 30379,
     "consumed": 160,
     "cPrice": 1.45,
-    "total": 232
+    "total": 232.0
   },
   {
     "date": "2016-06-16T06:30:25.807Z",
@@ -422,6 +422,83 @@
   {
     "date": "2018-12-16T10:14:00.000Z",
     "cMeters": 4250,
+    "consumed": 1,
+    "cPrice": 1.65,
+    "total": 1.65
+  },
+  {
+    "date": "2019-01-20T19:17:47.122Z",
+    "cMeters": 4251,
+    "consumed": 1,
+    "cPrice": 1.65,
+    "total": 1.65
+  },
+  {
+    "date": "2019-02-18T19:18:46.025Z",
+    "cMeters": 4252,
+    "consumed": 1,
+    "cPrice": 1.65,
+    "total": 1.65
+  },
+  {
+    "date": "2019-03-18T19:28:23.308Z",
+    "cMeters": 4253,
+    "consumed": 1,
+    "cPrice": 1.65,
+    "total": 1.65
+  },
+  {
+    "date": "2019-04-16T19:31:29.057Z",
+    "cMeters": 4254,
+    "consumed": 1,
+    "cPrice": 1.65,
+    "total": 1.65
+  },
+  {
+    "date": "2019-05-16T19:31:29.057Z",
+    "cMeters": 4255,
+    "consumed": 1,
+    "cPrice": 1.65,
+    "total": 1.65
+  },
+  {
+    "date": "2019-06-16T19:31:29.057Z",
+    "cMeters": 4256,
+    "consumed": 1,
+    "cPrice": 1.65,
+    "total": 1.65
+  },
+  {
+    "date": "2019-07-20T19:47:58.815Z",
+    "cMeters": 4257,
+    "consumed": 1,
+    "cPrice": 1.65,
+    "total": 1.65
+  },
+  {
+    "date": "2019-08-20T19:47:58.815Z",
+    "cMeters": 4258,
+    "consumed": 1,
+    "cPrice": 1.65,
+    "total": 1.65
+  },
+  {
+    "date": "2019-09-20T19:47:58.815Z",
+    "cMeters": 4259,
+    "consumed": 1,
+    "cPrice": 1.65,
+    "total": 1.65
+  },
+  {
+    "date": "2019-10-20T19:47:58.815Z",
+    "cMeters": 4260,
+    "consumed": 1,
+    "cPrice": 1.65,
+    "total": 1.65
+  },
+  {
+    "date": "2019-11-20T19:47:58.815Z",
+    "cMeters": 4261,
     "consumed": 1,
     "cPrice": 1.65,
     "total": 1.65
