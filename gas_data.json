@@ -481,19 +481,5 @@
     "consumed": 1,
     "cPrice": 1.65,
     "total": 1.65
-  },
-  {
-    "date": "2019-09-20T19:47:58.815Z",
-    "cMeters": 4259,
-    "consumed": 1,
-    "cPrice": 1.65,
-    "total": 1.65
-  },
-  {
-    "date": "2019-10-20T19:47:58.815Z",
-    "cMeters": 4260,
-    "consumed": 1,
-    "cPrice": 1.65,
-    "total": 1.65
   }
 ]
