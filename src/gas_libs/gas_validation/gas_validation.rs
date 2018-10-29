@@ -1,24 +1,19 @@
-#![allow(dead_code)]
-#![allow(unused_imports)]
-// #![feature(extern_prelude)]
-
 extern crate chrono;
-// use chrono::{DateTime, Datelike, SecondsFormat, Utc};
 use chrono::prelude::*;
 
-use std::error::Error;
-
+// use std::error::Error;
+use std::fmt;
 use std::fs;
 use std::fs::File;
 use std::io::Read;
-
+// use std::env;
 extern crate serde;
 extern crate serde_json;
 
 extern crate cursive;
-use cursive::align::{HAlign, VAlign};
+use cursive::align::{HAlign};
 use cursive::traits::*;
-use cursive::view::{Offset, Position};
+// use cursive::view::{Offset, Position};
 use cursive::views::*;
 use cursive::Cursive;
 
@@ -27,10 +22,7 @@ use gas_libs::static_variables_form::static_variables_form as STATIC;
 fn validate_form_on_submit(s: &mut Cursive) {
     match validate_form(s) {
         Ok(gas_input) => {
-            let msg = format!(
-                "Form validated and saved on disk. \n{}",
-                gas_input.to_string()
-            );
+            let msg = format!("Form validated and saved on disk. \n{}", gas_input);
             s.add_layer(Dialog::info(msg));
         }
         Err(err) => s.add_layer(Dialog::info(err)),
@@ -51,7 +43,7 @@ fn delete_last_entry() {
     ));
 }
 
-pub fn validate_form(s: &mut Cursive) -> Result<GasEntry, String> {
+fn validate_form(s: &mut Cursive) -> Result<GasEntry, String> {
     let mut gas_entries = get_gas_entries(STATIC::GAS_DATA_JSON_FILE);
     let len_gas_entries = gas_entries.len();
     let last_gas: GasEntry = (gas_entries[len_gas_entries - 1]).clone();
@@ -117,7 +109,7 @@ pub fn validate_form(s: &mut Cursive) -> Result<GasEntry, String> {
     Ok(res_valid_form_gas_entry)
 }
 
-pub fn get_form_gas_input(s: &mut Cursive) -> Result<i32, String> {
+fn get_form_gas_input(s: &mut Cursive) -> Result<i32, String> {
     let gas_s = s
         .call_on_id(STATIC::GAS_CUBIC_METERS_ID, |view: &mut EditView| {
             view.get_content()
@@ -131,7 +123,7 @@ pub fn get_form_gas_input(s: &mut Cursive) -> Result<i32, String> {
     }
 }
 
-pub fn get_form_cubic_meter_price(s: &mut Cursive) -> Result<f64, String> {
+fn get_form_cubic_meter_price(s: &mut Cursive) -> Result<f64, String> {
     let gas_price_s = s
         .call_on_id(STATIC::GAS_CUBIC_PRICE_ID, |view: &mut EditView| {
             view.get_content()
@@ -148,7 +140,7 @@ pub fn get_form_cubic_meter_price(s: &mut Cursive) -> Result<f64, String> {
     }
 }
 
-pub fn get_form_date(s: &mut Cursive) -> Result<DateTime<chrono::FixedOffset>, String> {
+fn get_form_date(s: &mut Cursive) -> Result<DateTime<chrono::FixedOffset>, String> {
     let date_s = s
         .call_on_id(STATIC::GAS_DATE_ID, |view: &mut EditView| {
             view.get_content()
@@ -180,7 +172,7 @@ fn validate_gas_input_on_submit(input_gas: i32, last_gas: i32) -> Result<(), Str
     Ok(())
 }
 
-pub fn validate_cubic_meter_price_on_submit(form_cm_price: f64) -> Result<(), String> {
+fn validate_cubic_meter_price_on_submit(form_cm_price: f64) -> Result<(), String> {
     if form_cm_price <= 0.0 {
         return Err(format!(
             "Cubic price cannot be negative or zero {}",
@@ -191,7 +183,7 @@ pub fn validate_cubic_meter_price_on_submit(form_cm_price: f64) -> Result<(), St
     Ok(())
 }
 
-pub fn validate_date_on_form_submit(
+fn validate_date_on_form_submit(
     form_date: DateTime<chrono::FixedOffset>,
     last_date: DateTime<chrono::FixedOffset>,
 ) -> Result<(), String> {
@@ -267,14 +259,14 @@ pub fn populate_form_with_date_and_c_price(s: &mut Cursive) {
 // check functions are just checking for correct format ex: gas input date is an actual date,
 // gas input is a whole number.
 
-pub fn check_gas_field(s: &mut Cursive, _gas_amount: &str) {
+fn check_gas_field(s: &mut Cursive, _gas_amount: &str) {
     match get_form_gas_input(s) {
         Ok(_) => {}
         Err(err) => s.add_layer(Dialog::info(err)),
     }
 }
 
-pub fn check_cubic_meter_field(s: &mut Cursive, _cubic_meter_str: &str) {
+fn check_cubic_meter_field(s: &mut Cursive, _cubic_meter_str: &str) {
     match get_form_cubic_meter_price(s) {
         Ok(_) => {}
         Err(err) => s.add_layer(Dialog::info(err)),
@@ -290,7 +282,7 @@ fn check_date_field(s: &mut Cursive, _date: &str) {
 
 #[allow(non_snake_case)]
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct GasEntry {
+struct GasEntry {
     date: String,
     cMeters: i32,
     consumed: i32,
@@ -298,11 +290,11 @@ pub struct GasEntry {
     total: f64,
 }
 
-impl ToString for GasEntry {
-    fn to_string(&self) -> String {
-        format!(
-            "
-GasEntry {{
+impl fmt::Display for GasEntry {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "GasEntry {{
     cMeters: {} 
     Date: {} 
     consumed: {} 
@@ -314,7 +306,7 @@ GasEntry {{
     }
 }
 
-pub fn get_gas_entries(file: &str) -> Vec<GasEntry> {
+fn get_gas_entries(file: &str) -> Vec<GasEntry> {
     let mut json_file: File = File::open(file).expect(&format!(
         "\n- File: {} \n- line: {} \n- err: {}\n",
         file!(),
@@ -377,11 +369,12 @@ pub fn gas_entry_dialog(siv: &mut Cursive) {
                                 .with_id(STATIC::GAS_CUBIC_PRICE_ID)
                         )
                 ),
-        ).button("Validate & Insert", |s| validate_form_on_submit(s))
+        ).button("Insert", |s| validate_form_on_submit(s))
         .button("Delete Last Entry", |_| delete_last_entry())
         .button("Quit", |s| s.quit())
         .h_align(HAlign::Center),
     );
+    populate_form_with_date_and_c_price(siv);
 }
 
 #[cfg(test)]
