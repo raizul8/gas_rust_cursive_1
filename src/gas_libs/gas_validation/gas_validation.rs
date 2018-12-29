@@ -29,18 +29,25 @@ fn validate_form_on_submit(s: &mut Cursive) {
     }
 }
 
-fn delete_last_entry() {
-    let mut gas_entries = get_gas_entries(STATIC::GAS_DATA_JSON_FILE);
-    gas_entries.pop();
+fn delete_last_entry(s: &mut Cursive) {
+    s.add_layer(
+        Dialog::text("Delete last entry from file ?")
+            .button("Yes", |_| {
+                let mut gas_entries = get_gas_entries(STATIC::GAS_DATA_JSON_FILE);
+                gas_entries.pop();
+                let gas_entries_json = serde_json::to_string_pretty(&gas_entries).unwrap();
 
-    let gas_entries_json = serde_json::to_string_pretty(&gas_entries).unwrap();
-
-    fs::write(STATIC::GAS_DATA_JSON_FILE, &gas_entries_json).expect(&format!(
-        "\n- File: {} \n- line: {} \n- err: {}\n",
-        file!(),
-        line!(),
-        "Could not write to file"
-    ));
+                fs::write(STATIC::GAS_DATA_JSON_FILE, &gas_entries_json).expect(&format!(
+                    "\n- File: {} \n- line: {} \n- err: {}\n",
+                    file!(),
+                    line!(),
+                    "Could not write to file"
+                ));
+            })
+            .button("No", |s| {
+                s.pop_layer();
+            }),
+    );
 }
 
 fn validate_form(s: &mut Cursive) -> Result<GasEntry, String> {
@@ -113,7 +120,8 @@ fn get_form_gas_input(s: &mut Cursive) -> Result<i32, String> {
     let gas_s = s
         .call_on_id(STATIC::GAS_CUBIC_METERS_ID, |view: &mut EditView| {
             view.get_content()
-        }).unwrap();
+        })
+        .unwrap();
 
     let gas_amount = gas_s.parse::<i32>();
 
@@ -127,7 +135,8 @@ fn get_form_cubic_meter_price(s: &mut Cursive) -> Result<f64, String> {
     let gas_price_s = s
         .call_on_id(STATIC::GAS_CUBIC_PRICE_ID, |view: &mut EditView| {
             view.get_content()
-        }).unwrap();
+        })
+        .unwrap();
 
     let gas_price = gas_price_s.parse::<f64>();
 
@@ -144,7 +153,8 @@ fn get_form_date(s: &mut Cursive) -> Result<DateTime<chrono::FixedOffset>, Strin
     let date_s = s
         .call_on_id(STATIC::GAS_DATE_ID, |view: &mut EditView| {
             view.get_content()
-        }).unwrap()
+        })
+        .unwrap()
         .to_string();
 
     let rfc3339 = DateTime::parse_from_rfc3339(&date_s);
@@ -347,17 +357,14 @@ pub fn gas_entry_dialog(siv: &mut Cursive) {
                                 .on_submit(check_gas_field)
                                 .with_id(STATIC::GAS_CUBIC_METERS_ID)
                                 .fixed_width(35),
-                        )
+                        ),
                 )
                 .child(
-                    Dialog::new()
-                        .title("Date:")
-                        .padding((1, 1, 1, 0))
-                        .content(
-                            EditView::new()
-                                .on_submit(check_date_field)
-                                .with_id(STATIC::GAS_DATE_ID)
-                        )
+                    Dialog::new().title("Date:").padding((1, 1, 1, 0)).content(
+                        EditView::new()
+                            .on_submit(check_date_field)
+                            .with_id(STATIC::GAS_DATE_ID),
+                    ),
                 )
                 .child(
                     Dialog::new()
@@ -366,11 +373,12 @@ pub fn gas_entry_dialog(siv: &mut Cursive) {
                         .content(
                             EditView::new()
                                 .on_submit(check_cubic_meter_field)
-                                .with_id(STATIC::GAS_CUBIC_PRICE_ID)
-                        )
+                                .with_id(STATIC::GAS_CUBIC_PRICE_ID),
+                        ),
                 ),
-        ).button("Insert", |s| validate_form_on_submit(s))
-        .button("Delete Last Entry", |_| delete_last_entry())
+        )
+        .button("Insert", |s| validate_form_on_submit(s))
+        .button("Delete Last Entry", |s| delete_last_entry(s))
         .button("Quit", |s| s.quit())
         .h_align(HAlign::Center),
     );

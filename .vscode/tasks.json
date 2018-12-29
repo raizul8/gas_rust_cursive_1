@@ -1,0 +1,61 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "cargo run",
+            "command": "cargo",
+            "args": [
+                "run"
+            ],
+            "problemMatcher": [
+                "$rustc"
+            ]
+        },
+        {
+            "type": "shell",
+            "label": "cargo test current test",
+            "command": "cargo test -- --nocapture t_validate_date_on_form_submit",
+            "args": [],
+            "problemMatcher": [
+                "$rustc"
+            ]
+        }
+        // ,
+        // {
+        //     "label": "run main",
+        //     "type": "shell",
+        //     "command": "cargo",
+        //     "args": [
+        //         "run"
+        //     ],
+        //     // "presentation": {
+        //     //     "echo": true,
+        //     //     "reveal": "always",
+        //     //     "focus": true,
+        //     //     "panel": "shared"
+        //     // },
+        //     // "problemMatcher": []
+        // },
+        // {
+        //     "type": "shell",
+        //     "label": "cargo fmt",
+        //     "command": "cargo",
+        //     "args": [
+        //         "carg fmt"
+        //     ],
+        //     "problemMatcher": [
+        //         // "$rustc"
+        //     ]
+        // },
+        // {
+        //     "label": "format and run",
+        //     "dependsOn": [
+        //         "cargo fmt",
+        //         "run main"
+        //     ]
+        // },
+    ]
+}

@@ -1,6 +1,6 @@
 // #![allow(dead_code)]
 // #![allow(unused_imports)]
-#![feature(extern_prelude)]
+// #![feature(extern_prelude)]
 
 #[macro_use]
 extern crate serde_derive;
@@ -31,7 +31,7 @@ fn cursive_linear() {
     let mut siv = Cursive::default();
 
     fv::gas_entry_dialog(&mut siv);
-    // fv::populate_form_with_date_and_c_price(&mut siv);
+    fv::populate_form_with_date_and_c_price(&mut siv);
 
     siv.run();
 }
