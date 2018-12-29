@@ -297,12 +297,12 @@ fn check_date_field(s: &mut Cursive, _date: &str) {
 
 #[allow(non_snake_case)]
 #[derive(Serialize, Deserialize, Debug, Clone)]
-struct GasEntry {
-    date: String,
-    cMeters: i32,
-    consumed: i32,
-    cPrice: f64,
-    total: f64,
+pub struct GasEntry {
+    pub date: String,
+    pub cMeters: i32,
+    pub consumed: i32,
+    pub cPrice: f64,
+    pub total: f64,
 }
 
 impl fmt::Display for GasEntry {
@@ -321,7 +321,7 @@ impl fmt::Display for GasEntry {
     }
 }
 
-fn get_gas_entries(file: &str) -> Vec<GasEntry> {
+pub fn get_gas_entries(file: &str) -> Vec<GasEntry> {
     let mut json_file: File = File::open(file).expect(&format!(
         "\n- File: {} \n- line: {} \n- err: {}\n",
         file!(),
