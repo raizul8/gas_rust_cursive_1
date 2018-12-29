@@ -30,10 +30,14 @@ fn validate_form_on_submit(s: &mut Cursive) {
 }
 
 fn delete_last_entry(s: &mut Cursive) {
+    let gas_entries = get_gas_entries(STATIC::GAS_DATA_JSON_FILE);
+    let last_entry = gas_entries[gas_entries.len() - 1].clone();
+    let del_msg = format!("Delete last entry from file ? \n{:#?}", last_entry);
+
     s.add_layer(
-        Dialog::text("Delete last entry from file ?")
-            .button("Yes", |_| {
-                let mut gas_entries = get_gas_entries(STATIC::GAS_DATA_JSON_FILE);
+        Dialog::text(del_msg)
+            .button("Yes", move |s| {
+                let mut gas_entries = gas_entries.clone();
                 gas_entries.pop();
                 let gas_entries_json = serde_json::to_string_pretty(&gas_entries).unwrap();
 
@@ -43,6 +47,7 @@ fn delete_last_entry(s: &mut Cursive) {
                     line!(),
                     "Could not write to file"
                 ));
+                s.pop_layer();
             })
             .button("No", |s| {
                 s.pop_layer();
