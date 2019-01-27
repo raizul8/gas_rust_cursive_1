@@ -47,6 +47,7 @@ fn delete_last_entry(s: &mut Cursive) {
                     line!(),
                     "Could not write to file"
                 ));
+
                 s.pop_layer();
             })
             .button("No", |s| {
